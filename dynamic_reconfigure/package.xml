@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>dynamic_reconfigure</name>
+  <version>0.4.0</version>
+  <description>
+    C++ nodes which were previously in the ros2/examples repository but are now just used for demo purposes.
+  </description>
+  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>python_cmake_module</buildtool_depend>
+ 
+  <build_depend>rclcpp</build_depend>
+  <build_depend>rclpy</build_depend>
+  <build_depend>rcutils</build_depend>
+
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rcutils</exec_depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
