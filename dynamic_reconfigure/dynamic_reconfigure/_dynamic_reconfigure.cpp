@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "rclcpp/rclcpp.hpp"
 #include "rcl/rcl.h"
-#include "dynamicReconfServerPy.hpp" 
+#include "dynamic_reconfigure_server_py.hpp" 
 #include "rqt_support.hpp"
 #include "rclcpp/parameter.hpp"
 
@@ -82,18 +82,11 @@ static PyObject *get_values(PyObject * Py_UNUSED(self), PyObject * args)
     if (!PyArg_ParseTuple(args, "z", &remote_name)) {
         return NULL;
     }
-    printf("remote_name = %s\n", remote_name);
-    printf("before node_init\n");
+
     auto node = rclcpp::Node::make_shared("get_parameters_try_client");
-    printf("after node_init\n");
-    printf("before client_init\n");
+
     std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
-    //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
-    //rqt_reconfigure::Client_map::check_map.begin();
-    //int temp = rqt_reconfigure::client_map.get_client(node, remote_name);
-    printf("after client_init\n");
     std::vector<rclcpp::parameter::ParameterVariant> values = test_client->get_values();
-    printf("after get_description\n");
     PyObject* dict=PyDict_New();
     for (auto & parameter : values) {
         _set_dict(dict, parameter);
@@ -106,27 +99,20 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
 {
     //rcl_shutdown();
     //auto parameters_client=_init_client("set_parameters_client");
-    printf("update_parameters\n");
-    printf("0\n");
+
     PyObject* dict;
     char* remote_name;
-    printf("1\n");
     PyArg_ParseTuple(args, "zO", &remote_name, &dict);
-    printf("2\n");
     //printf("remote_name = %s\n", remote_name);
     PyObject* l=PyDict_Keys(dict);
-    printf("3\n");
     Py_ssize_t i=0;
     std::vector<rclcpp::parameter::ParameterVariant> para;
-    printf("4\n");
     for(i=0;i<PyList_GET_SIZE(l);++i){
-        printf("i=%d\n",i);
         PyObject* key=PyList_GetItem(l,i);
         if(PyUnicode_Check(key)){
             para.push_back(_make_param(dict, key));
         }
     }
-    printf("5\n");
     auto node = rclcpp::Node::make_shared("get_parameters_try_client");
     std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
     //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
@@ -188,6 +174,7 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
         std::string name_c = PyUnicode_AsUTF8(name);
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","name"), name_c, "name"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","description"), name_c, "des"));
+        cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","edit_method"), name_c, "edit"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","type"), name_c, "type"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","level"), name_c, "lev"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","min"), name_c, "min"));
