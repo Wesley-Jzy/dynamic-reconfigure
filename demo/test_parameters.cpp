@@ -2,7 +2,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/parameter.hpp"
-#include "testRclConfig.h"
+#include "TestRclConfig.h"
 #include "dynamic_reconfigure_server_cpp.hpp"
 #include <vector>
 #include <string>
