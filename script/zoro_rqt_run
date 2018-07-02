@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+from zoro_rqt_reconfigure.rqt_reconfigure import param_widget as pw
+
+pw.main()
+

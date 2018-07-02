@@ -82,6 +82,8 @@ include_directories(cfg)
 add_executable(test_parameters demo/test_parameters.cpp)
 ament_target_dependencies(test_parameters rclcpp rcutils)
 install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
+install(files script/zoro_rqt_run  DESTINATION script)
+
 
 
 
