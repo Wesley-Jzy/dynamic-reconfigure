@@ -82,9 +82,8 @@ include_directories(cfg)
 add_executable(test_parameters demo/test_parameters.cpp)
 ament_target_dependencies(test_parameters rclcpp rcutils)
 install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 
-
-
-
+ament_export_include_directories(include)
 ament_package()
