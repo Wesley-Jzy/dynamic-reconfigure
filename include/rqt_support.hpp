@@ -17,8 +17,8 @@ public:
       name_vec.push_back(name.substr(5));
     }
   }
-  std::vector<rclcpp::parameter::ParameterVariant> get_description(){
-    std::vector<rclcpp::parameter::ParameterVariant> description;
+  std::vector<rclcpp::Parameter> get_description(){
+    std::vector<rclcpp::Parameter> description;
     for (std::string name : name_vec) {
       auto param_des = parameters_client.get_parameters({
         "name." + name,
@@ -35,9 +35,9 @@ public:
     }
     return description;
   }
-  std::vector<rclcpp::parameter::ParameterVariant> get_values(){
+  std::vector<rclcpp::Parameter> get_values(){
     
-    std::vector<rclcpp::parameter::ParameterVariant> values;
+    std::vector<rclcpp::Parameter> values;
     for (std::string name : name_vec) {
       auto param_des = parameters_client.get_parameters({
         "value." + name,
@@ -47,7 +47,7 @@ public:
     }
     return values;
   }
-  void update_params(std::vector<rclcpp::parameter::ParameterVariant> para) {
+  void update_params(std::vector<rclcpp::Parameter> para) {
     auto set_parameters_results = parameters_client.set_parameters(para);
   }
 private:

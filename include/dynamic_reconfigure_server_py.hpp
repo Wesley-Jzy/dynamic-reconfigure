@@ -20,10 +20,10 @@ public:
   
   RCLCPP_PUBLIC
   explicit Server_py(const std::string node_name, PyObject* python_callback_,
-      const std::vector<rclcpp::parameter::ParameterVariant> &parameter_init) : python_callback(python_callback_) {
+      const std::vector<rclcpp::Parameter> &parameter_init) : python_callback(python_callback_) {
     printf("Server init____________\n");
     node = rclcpp::Node::make_shared(node_name);
-    parameter_service = std::make_shared<rclcpp::ParameterService>(node);
+    //parameter_service = std::make_shared<rclcpp::ParameterService>(node);
     //auto parameters_init_client = std::make_shared<rclcpp::SyncParametersClient>(node);
     node->set_parameters(parameter_init);
     
@@ -36,7 +36,7 @@ public:
     }
 
     auto callback =
-      [this](const std::vector<rclcpp::parameter::ParameterVariant> & parameter_changed) 
+      [this](const std::vector<rclcpp::Parameter> & parameter_changed) 
         -> rcl_interfaces::msg::SetParametersResult
       { 
         this->param_change(parameter_changed);
@@ -47,7 +47,7 @@ public:
     node->register_param_change_callback(callback);
     rclcpp::spin(node);
   }
-  void param_change(const std::vector<rclcpp::parameter::ParameterVariant> &parameter_changed) {
+  void param_change(const std::vector<rclcpp::Parameter> &parameter_changed) {
     for (auto iter = values.begin(); iter != values.end();) {
       if(iter->get_name() == parameter_changed[0].get_name()) {
         iter = values.erase(iter);
@@ -62,20 +62,20 @@ public:
       std::string name = parameter.get_name().data();
       name = name.substr(6);
       switch(parameter.get_type()){
-        case rclcpp::parameter::ParameterType::PARAMETER_BOOL:
+        case rclcpp::ParameterType::PARAMETER_BOOL:
           if(parameter.as_bool()) {
             PyDict_SetItemString(dict, name.c_str(), Py_True);
           } else {
             PyDict_SetItemString(dict, name.c_str(), Py_False);
           }
           continue;
-        case rclcpp::parameter::ParameterType::PARAMETER_INTEGER:
+        case rclcpp::ParameterType::PARAMETER_INTEGER:
           PyDict_SetItemString(dict, name.c_str(), PyLong_FromLong(parameter.as_int()));
           continue;
-        case rclcpp::parameter::ParameterType::PARAMETER_DOUBLE:
+        case rclcpp::ParameterType::PARAMETER_DOUBLE:
           PyDict_SetItemString(dict, name.c_str(), PyFloat_FromDouble(parameter.as_double()));
           continue;
-        case rclcpp::parameter::ParameterType::PARAMETER_STRING:
+        case rclcpp::ParameterType::PARAMETER_STRING:
           PyDict_SetItemString(dict, name.c_str(), PyUnicode_FromString(parameter.as_string().data()));
           continue;
         default:
@@ -89,9 +89,9 @@ public:
     }
   }
 private:
-  std::shared_ptr<rclcpp::ParameterService> parameter_service;
+  //std::shared_ptr<rclcpp::ParameterService> parameter_service;
   rclcpp::Node::SharedPtr node;
-  std::vector<rclcpp::parameter::ParameterVariant> values;
+  std::vector<rclcpp::Parameter> values;
   PyObject* python_callback;
 };
 

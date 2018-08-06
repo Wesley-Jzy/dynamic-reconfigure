@@ -5,51 +5,51 @@
 #include "rqt_support.hpp"
 #include "rclcpp/parameter.hpp"
 
-static rclcpp::parameter::ParameterVariant _make_param(PyObject* dict, PyObject* key)
+static rclcpp::Parameter _make_param(PyObject* dict, PyObject* key)
 {
     std::string key_string= PyUnicode_AsUTF8(key);
     PyObject* value=PyDict_GetItem(dict, key);
 
     if(PyUnicode_Check(value)){
-        return rclcpp::parameter::ParameterVariant(key_string, PyUnicode_AsUTF8(value));
+        return rclcpp::Parameter(key_string, PyUnicode_AsUTF8(value));
     }
 
     if(PyBool_Check(value)) {
         PyObject_Print(value, stdout, Py_PRINT_RAW);
         if (value==Py_True) {
-            return rclcpp::parameter::ParameterVariant(key_string, true);
+            return rclcpp::Parameter(key_string, true);
         } else {
-            return rclcpp::parameter::ParameterVariant(key_string, false);
+            return rclcpp::Parameter(key_string, false);
         }
     }
 
     if( PyLong_Check(value)) {
-        return rclcpp::parameter::ParameterVariant(key_string, PyLong_AsLong(value));
+        return rclcpp::Parameter(key_string, PyLong_AsLong(value));
     }
 
     if( PyFloat_Check(value)) {
-        return rclcpp::parameter::ParameterVariant(key_string, PyFloat_AsDouble(value));
+        return rclcpp::Parameter(key_string, PyFloat_AsDouble(value));
     }
-    return rclcpp::parameter::ParameterVariant("", 0);
+    return rclcpp::Parameter("", 0);
 }
 
-static void _set_dict(PyObject* dict, rclcpp::parameter::ParameterVariant parameter)
+static void _set_dict(PyObject* dict, rclcpp::Parameter parameter)
 {
     switch(parameter.get_type()){
-        case rclcpp::parameter::ParameterType::PARAMETER_BOOL:
+        case rclcpp::ParameterType::PARAMETER_BOOL:
             if(parameter.as_bool()) {
                 PyDict_SetItemString(dict, parameter.get_name().data(), Py_True);
             } else {
                 PyDict_SetItemString(dict, parameter.get_name().data(), Py_False);
             }
             return;
-        case rclcpp::parameter::ParameterType::PARAMETER_INTEGER:
+        case rclcpp::ParameterType::PARAMETER_INTEGER:
             PyDict_SetItemString(dict, parameter.get_name().data(), PyLong_FromLong(parameter.as_int()));
             return;
-        case rclcpp::parameter::ParameterType::PARAMETER_DOUBLE:
+        case rclcpp::ParameterType::PARAMETER_DOUBLE:
             PyDict_SetItemString(dict, parameter.get_name().data(), PyFloat_FromDouble(parameter.as_double()));
             return;
-        case rclcpp::parameter::ParameterType::PARAMETER_STRING:
+        case rclcpp::ParameterType::PARAMETER_STRING:
             PyDict_SetItemString(dict, parameter.get_name().data(), PyUnicode_FromString(parameter.as_string().data()));
             return;
         default:
@@ -68,7 +68,7 @@ static PyObject *get_description(PyObject * Py_UNUSED(self), PyObject * args)
     auto node = rclcpp::Node::make_shared("get_parameters_try_client");
     std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
     //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
-    std::vector<rclcpp::parameter::ParameterVariant> descritions = test_client->get_description();
+    std::vector<rclcpp::Parameter> descritions = test_client->get_description();
     PyObject* dict=PyDict_New();
     for (auto & parameter : descritions) {
         _set_dict(dict, parameter);
@@ -86,7 +86,7 @@ static PyObject *get_values(PyObject * Py_UNUSED(self), PyObject * args)
     auto node = rclcpp::Node::make_shared("get_parameters_try_client");
 
     std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
-    std::vector<rclcpp::parameter::ParameterVariant> values = test_client->get_values();
+    std::vector<rclcpp::Parameter> values = test_client->get_values();
     PyObject* dict=PyDict_New();
     for (auto & parameter : values) {
         _set_dict(dict, parameter);
@@ -106,7 +106,7 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
     //printf("remote_name = %s\n", remote_name);
     PyObject* l=PyDict_Keys(dict);
     Py_ssize_t i=0;
-    std::vector<rclcpp::parameter::ParameterVariant> para;
+    std::vector<rclcpp::Parameter> para;
     for(i=0;i<PyList_GET_SIZE(l);++i){
         PyObject* key=PyList_GetItem(l,i);
         if(PyUnicode_Check(key)){
@@ -118,7 +118,7 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
     //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
     test_client->update_params(para);
 
-    std::vector<rclcpp::parameter::ParameterVariant> values = test_client->get_values();
+    std::vector<rclcpp::Parameter> values = test_client->get_values();
 
     PyObject* ans=PyDict_New();
     for (auto & parameter : values) {
@@ -131,32 +131,32 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
 
 
 
-static rclcpp::parameter::ParameterVariant _make_param_add_name(PyObject* dict, PyObject* key, std::string name, std::string short_form)
+static rclcpp::Parameter _make_param_add_name(PyObject* dict, PyObject* key, std::string name, std::string short_form)
 {
     std::string key_string= short_form + '.' + name;
     PyObject* value=PyDict_GetItem(dict, key);
 
     if(PyUnicode_Check(value)){
-        return rclcpp::parameter::ParameterVariant(key_string, PyUnicode_AsUTF8(value));
+        return rclcpp::Parameter(key_string, PyUnicode_AsUTF8(value));
     }
 
     if(PyBool_Check(value)) {
         //PyObject_Print(value, stdout, Py_PRINT_RAW);
         if (value==Py_True) {
-            return rclcpp::parameter::ParameterVariant(key_string, true);
+            return rclcpp::Parameter(key_string, true);
         } else {
-            return rclcpp::parameter::ParameterVariant(key_string, false);
+            return rclcpp::Parameter(key_string, false);
         }
     }
 
     if( PyLong_Check(value)) {
-        return rclcpp::parameter::ParameterVariant(key_string, PyLong_AsLong(value));
+        return rclcpp::Parameter(key_string, PyLong_AsLong(value));
     }
 
     if( PyFloat_Check(value)) {
-        return rclcpp::parameter::ParameterVariant(key_string, PyFloat_AsDouble(value));
+        return rclcpp::Parameter(key_string, PyFloat_AsDouble(value));
     }
-    return rclcpp::parameter::ParameterVariant("", 0);
+    return rclcpp::Parameter("", 0);
 }
 
 static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args)
@@ -166,7 +166,7 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
     PyObject *cfg_list;
     PyArg_ParseTuple(args, "zOO", &service_name, &python_handle, &cfg_list);
 
-    std::vector<rclcpp::parameter::ParameterVariant> cfg_all;
+    std::vector<rclcpp::Parameter> cfg_all;
 
     for(int i = 0; i < PyList_GET_SIZE(cfg_list); ++i) {
         PyObject* param = PyList_GetItem(cfg_list, i);

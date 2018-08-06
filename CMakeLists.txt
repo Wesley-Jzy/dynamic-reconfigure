@@ -79,9 +79,9 @@ ament_target_dependencies(dynamic_reconfigure_ "rcl" "rcutils" "rclcpp")
 
 include_directories(include)
 include_directories(cfg)
-add_executable(test_parameters demo/test_parameters.cpp)
-ament_target_dependencies(test_parameters rclcpp rcutils)
-install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
+#add_executable(test_parameters demo/test_parameters.cpp)
+#ament_target_dependencies(test_parameters rclcpp rcutils)
+#install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 
