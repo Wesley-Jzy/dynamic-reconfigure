@@ -563,19 +563,19 @@ Have a nice day
         f.write('//created by ParameterGenerator\n')
         f.write('#ifndef __' + self.name + '__TUTORIALSCONFIG_H__\n')
         f.write('#define __' + self.name + '__TUTORIALSCONFIG_H__\n\n#include<vector>\n#include<string>\n\n')
-        f.write('class ConfigureVec {\npublic:\n  ConfigureVec() {\n    ParameterVariantVec = std::vector<rclcpp::parameter::ParameterVariant> ({\n')
+        f.write('class ConfigureVec {\npublic:\n  ConfigureVec() {\n    ParameterVariantVec = std::vector<rclcpp::Parameter> ({\n')
         for param in self.group.parameters:
             print(param)
-            f.write('      rclcpp::parameter::ParameterVariant(\"name.' + param['name'] + '\",\"' + param['name'] +'\"),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"des.' + param['name'] + '\",\"' + param['description'] +'\"),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"type.' + param['name'] + '\",\"' + param['type'] +'\"),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"lev.' + param['name'] + '\",' + str(param['level']) +'),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"min.' + param['name'] + '\",' + value_cpp(param['type'], param['min']) +'),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"max.' + param['name'] + '\",' + value_cpp(param['type'], param['max']) +'),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"default.' + param['name'] + '\",' + value_cpp(param['type'], param['default']) +'),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"value.' + param['name'] + '\",' + value_cpp(param['type'], param['default']) +'),\n')
-            f.write('      rclcpp::parameter::ParameterVariant(\"edit.' + param['name'] + '\",\"' + param['edit_method'] +'\"),\n')
-        f.write('    });\n  }\n  std::vector<rclcpp::parameter::ParameterVariant> getParameterVariantVec() {\n    return ParameterVariantVec;\n  }\n')
+            f.write('      rclcpp::Parameter(\"name.' + param['name'] + '\",\"' + param['name'] +'\"),\n')
+            f.write('      rclcpp::Parameter(\"des.' + param['name'] + '\",\"' + param['description'] +'\"),\n')
+            f.write('      rclcpp::Parameter(\"type.' + param['name'] + '\",\"' + param['type'] +'\"),\n')
+            f.write('      rclcpp::Parameter(\"lev.' + param['name'] + '\",' + str(param['level']) +'),\n')
+            f.write('      rclcpp::Parameter(\"min.' + param['name'] + '\",' + value_cpp(param['type'], param['min']) +'),\n')
+            f.write('      rclcpp::Parameter(\"max.' + param['name'] + '\",' + value_cpp(param['type'], param['max']) +'),\n')
+            f.write('      rclcpp::Parameter(\"default.' + param['name'] + '\",' + value_cpp(param['type'], param['default']) +'),\n')
+            f.write('      rclcpp::Parameter(\"value.' + param['name'] + '\",' + value_cpp(param['type'], param['default']) +'),\n')
+            f.write('      rclcpp::Parameter(\"edit.' + param['name'] + '\",\"' + param['edit_method'] +'\"),\n')
+        f.write('    });\n  }\n  std::vector<rclcpp::Parameter> getParameterVariantVec() {\n    return ParameterVariantVec;\n  }\n')
         '''
         for param in self.group.parameters:
             if (param['type'] == 'str'):
@@ -583,7 +583,7 @@ Have a nice day
             else:
                 f.write('  ' + param['type'] + ' ' + param['name'] + ' = ' + value_cpp(param['type'], param['default']) + ';\n')
         '''
-        f.write('private:\nstd::vector<rclcpp::parameter::ParameterVariant> ParameterVariantVec;\n};\n#endif\n')
+        f.write('private:\nstd::vector<rclcpp::Parameter> ParameterVariantVec;\n};\n#endif\n')
         f.close()
 
 
