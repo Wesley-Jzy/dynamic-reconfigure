@@ -59,7 +59,7 @@ private:
 class Client_map {
 public:
   std::map<std::string, std::shared_ptr<Client>> check_map;
-  std::shared_ptr<Client> get_client(const rclcpp::Node::SharedPtr node, std::string remote_name) {
+  std::shared_ptr<Client> get_client(std::string remote_name) {
     //auto iter = check_map.find(remote_name);
     
     if (check_map.count(remote_name) != 0) {
@@ -67,6 +67,7 @@ public:
       return check_map.find(remote_name)->second;
       //return check_map[remote_name];
     }
+    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
     std::shared_ptr<Client> get = std::make_shared<Client>(node, remote_name);
     check_map[remote_name] = get;
     return get;

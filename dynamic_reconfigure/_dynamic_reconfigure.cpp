@@ -5,6 +5,7 @@
 #include "rqt_support.hpp"
 #include "rclcpp/parameter.hpp"
 
+
 static rclcpp::Parameter _make_param(PyObject* dict, PyObject* key)
 {
     std::string key_string= PyUnicode_AsUTF8(key);
@@ -65,8 +66,8 @@ static PyObject *get_description(PyObject * Py_UNUSED(self), PyObject * args)
         return NULL;
     }
 
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
     std::vector<rclcpp::Parameter> descritions = test_client->get_description();
     PyObject* dict=PyDict_New();
@@ -83,9 +84,9 @@ static PyObject *get_values(PyObject * Py_UNUSED(self), PyObject * args)
         return NULL;
     }
 
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
 
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     std::vector<rclcpp::Parameter> values = test_client->get_values();
     PyObject* dict=PyDict_New();
     for (auto & parameter : values) {
@@ -113,9 +114,9 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
             para.push_back(_make_param(dict, key));
         }
     }
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
-    //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
+
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     test_client->update_params(para);
 
     std::vector<rclcpp::Parameter> values = test_client->get_values();
