@@ -84,6 +84,7 @@ add_executable(test_parameters demo/test_parameters.cpp)
 ament_target_dependencies(test_parameters rclcpp rcutils)
 install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
+install(FILES cfg/parameter_generator_catkin.py  DESTINATION "${PYTHON_INSTALL_DIR}")
 
 
 ament_export_include_directories(include)
