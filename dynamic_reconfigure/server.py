@@ -12,5 +12,6 @@ def dy_wrapper(service_name, python_handler, cfg_list):
     callback = python_handler
 
 def Server(service_name, python_handler, cfg_list):
+    service_name = "DynamicReconfigure_" + service_name
     dy_wrapper(service_name, python_handler, cfg_list)
 

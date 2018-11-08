@@ -190,7 +190,6 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "default"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "value"));
     }
-    printf("%p\n", python_handle); 
     std::thread t(workThread, service_name, python_handle, cfg_all);
     t.detach();
     //rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
