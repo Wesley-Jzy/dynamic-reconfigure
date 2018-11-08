@@ -26,6 +26,7 @@ public:
     //parameter_service = std::make_shared<rclcpp::ParameterService>(node);
     //auto parameters_init_client = std::make_shared<rclcpp::SyncParametersClient>(node);
     node->set_parameters(parameter_init);
+    printf("%p\n", python_callback_);
     
     auto listdata = node->list_parameters({"name"}, 0);
     for(auto name : listdata.names) {
@@ -39,7 +40,11 @@ public:
       [this](const std::vector<rclcpp::Parameter> & parameter_changed) 
         -> rcl_interfaces::msg::SetParametersResult
       { 
+        PyGILState_STATE _state = PyGILState_Ensure();
+        printf("lock\n");
         this->param_change(parameter_changed);
+        PyGILState_Release(_state);
+        printf("unlock\n");
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = 1;
         return result;
@@ -51,6 +56,7 @@ public:
     for (auto iter = values.begin(); iter != values.end();) {
       if(iter->get_name() == parameter_changed[0].get_name()) {
         iter = values.erase(iter);
+        printf("%s\n",  parameter_changed[0].get_name().data());
       }
       else
         iter ++;
@@ -84,8 +90,14 @@ public:
     }
 
     PyObject* arglist = Py_BuildValue("(O)", dict);
+    printf("before callback\n");
     if (PyCallable_Check(python_callback)) {
-      PyEval_CallObject(python_callback, arglist);
+      printf("in callback\n");
+      printf("%p\n", python_callback);
+      PyObject *pReturn = PyEval_CallObject(python_callback, arglist);
+      int result = 0;
+      PyArg_Parse(pReturn, "i", &result);
+      printf("result %d\n", result);
     }
   }
 private:
