@@ -4,6 +4,7 @@
 #include "dynamic_reconfigure_server_py.hpp" 
 #include "rqt_support.hpp"
 #include "rclcpp/parameter.hpp"
+#include <thread>
 
 static rclcpp::Parameter _make_param(PyObject* dict, PyObject* key)
 {
@@ -65,8 +66,8 @@ static PyObject *get_description(PyObject * Py_UNUSED(self), PyObject * args)
         return NULL;
     }
 
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
     std::vector<rclcpp::Parameter> descritions = test_client->get_description();
     PyObject* dict=PyDict_New();
@@ -83,9 +84,9 @@ static PyObject *get_values(PyObject * Py_UNUSED(self), PyObject * args)
         return NULL;
     }
 
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
 
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     std::vector<rclcpp::Parameter> values = test_client->get_values();
     PyObject* dict=PyDict_New();
     for (auto & parameter : values) {
@@ -113,9 +114,9 @@ static  PyObject *update_parameters(PyObject * Py_UNUSED(self), PyObject *args)
             para.push_back(_make_param(dict, key));
         }
     }
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
-    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(node, remote_name);
-    //rqt_reconfigure::Client test_client = rqt_reconfigure::Client(node, remote_name);
+
+    //auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    std:: shared_ptr<rqt_reconfigure::Client> test_client = rqt_reconfigure::client_map.get_client(remote_name);
     test_client->update_params(para);
 
     std::vector<rclcpp::Parameter> values = test_client->get_values();
@@ -159,6 +160,13 @@ static rclcpp::Parameter _make_param_add_name(PyObject* dict, PyObject* key, std
     return rclcpp::Parameter("", 0);
 }
 
+
+
+static void workThread(char* service_name, PyObject *python_handle, std::vector<rclcpp::Parameter> cfg_all) {
+    rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
+}
+
+
 static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args)
 {
     char* service_name;
@@ -182,7 +190,9 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "default"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "value"));
     }
-    rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
+    std::thread t(workThread, service_name, python_handle, cfg_all);
+    t.detach();
+    //rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
     Py_RETURN_NONE;
 }
 

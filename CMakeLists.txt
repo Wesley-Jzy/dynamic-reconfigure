@@ -19,6 +19,7 @@ find_package(std_msgs REQUIRED)
 find_package(python_cmake_module REQUIRED)
 find_package(PythonExtra MODULE REQUIRED)
 
+
 set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
 if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
@@ -83,6 +84,7 @@ add_executable(test_parameters demo/test_parameters.cpp)
 ament_target_dependencies(test_parameters rclcpp rcutils)
 install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
+install(FILES cfg/parameter_generator_catkin.py  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}")
 
 
 ament_export_include_directories(include)

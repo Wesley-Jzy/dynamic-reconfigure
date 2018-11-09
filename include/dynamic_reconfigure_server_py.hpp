@@ -39,7 +39,9 @@ public:
       [this](const std::vector<rclcpp::Parameter> & parameter_changed) 
         -> rcl_interfaces::msg::SetParametersResult
       { 
+        PyGILState_STATE _state = PyGILState_Ensure();
         this->param_change(parameter_changed);
+        PyGILState_Release(_state);
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = 1;
         return result;
@@ -85,7 +87,7 @@ public:
 
     PyObject* arglist = Py_BuildValue("(O)", dict);
     if (PyCallable_Check(python_callback)) {
-      PyEval_CallObject(python_callback, arglist);
+        PyEval_CallObject(python_callback, arglist);
     }
   }
 private:
