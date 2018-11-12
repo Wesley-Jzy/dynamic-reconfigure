@@ -32,11 +32,10 @@ int main(int argc, char ** argv)
 
   rclcpp::init(argc, argv);
   printf("start node\n");
-  auto node = rclcpp::Node::make_shared("get_parameters3");
+  auto node = rclcpp::Node::make_shared("your_work_node");
   
-  auto ser_ptr = std::make_shared<rqt_reconfigure::Server<ConfigureVec>>(node, cb);
+  auto ser_ptr = std::make_shared<rqt_reconfigure::Server<ConfigureVec>>("dy_service_name", cb);
 
   rclcpp::spin(node);
-  rclcpp::shutdown();
   return 0;
 }

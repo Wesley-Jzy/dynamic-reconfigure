@@ -38,7 +38,7 @@ public:
     auto callback =
       [this](const std::vector<rclcpp::Parameter> & parameter_changed) 
         -> rcl_interfaces::msg::SetParametersResult
-      { 
+      {
         PyGILState_STATE _state = PyGILState_Ensure();
         this->param_change(parameter_changed);
         PyGILState_Release(_state);

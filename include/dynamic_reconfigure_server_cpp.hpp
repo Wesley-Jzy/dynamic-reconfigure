@@ -16,20 +16,23 @@
 #include <string>
 #include <boost/any.hpp>
 
+#include <thread>
+
 namespace rqt_reconfigure {
 
 template <class ConfigType> 
-class Server {
+class Server_cpp {
 public:
-  RCLCPP_SMART_PTR_DEFINITIONS(Server)
+  RCLCPP_SMART_PTR_DEFINITIONS(Server_cpp)
   
   RCLCPP_PUBLIC
-  explicit Server(const rclcpp::Node::SharedPtr node_,
+  explicit Server_cpp(const std::string node_name,
       std::function<void(std::map<std::string, boost::any>)> user_callback) :
-      node(node_), callback_function(user_callback) {
+      callback_function(user_callback) {
     printf("Server init____________\n");
     //parameter_service = std::make_shared<rclcpp::ParameterService>(node);
     //auto parameters_init_client = std::make_shared<rclcpp::SyncParametersClient>(node);
+    node = rclcpp::Node::make_shared(node_name);
     node->set_parameters(ConfigType().getParameterVariantVec());
     auto listdata = node->list_parameters({"name"}, 0);
     for(auto name : listdata.names) {
@@ -48,6 +51,7 @@ public:
         return result;
       };
     node->register_param_change_callback(callback);
+    rclcpp::spin(node);
   }
   void param_change(const std::vector<rclcpp::Parameter> &parameter_changed) {
     for (auto iter = values.begin(); iter != values.end();) {
@@ -91,6 +95,26 @@ private:
   rclcpp::Node::SharedPtr node;
   std::vector<rclcpp::Parameter> values;
   std::function<void(std::map<std::string, boost::any>)> callback_function;
+};
+
+static void workThread(const std::string node_name,
+                      std::function<void(std::map<std::string, boost::any>)> user_callback) {
+        rqt_reconfigure::Server_cpp<ConfigureVec>(node_name, user_callback);
+      }
+
+
+template <class ConfigType>
+class Server {
+  public:
+      explicit Server(const std::string node_name,
+                      std::function<void(std::map<std::string, boost::any>)> user_callback)
+                      :callback_function(user_callback) {
+        std::string new_node_name = "DynamicReconfigure_" + node_name;
+        std::thread t(workThread, new_node_name, callback_function);
+        t.detach();     
+      }
+  private:
+    std::function<void(std::map<std::string, boost::any>)> callback_function;
 };
 
 }//rqt_reconfigure

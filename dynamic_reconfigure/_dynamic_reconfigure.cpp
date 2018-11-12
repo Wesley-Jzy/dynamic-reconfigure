@@ -163,6 +163,9 @@ static rclcpp::Parameter _make_param_add_name(PyObject* dict, PyObject* key, std
 
 
 static void workThread(char* service_name, PyObject *python_handle, std::vector<rclcpp::Parameter> cfg_all) {
+    if (!PyEval_ThreadsInitialized()) {
+        PyEval_InitThreads();
+    }
     rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
 }
 
