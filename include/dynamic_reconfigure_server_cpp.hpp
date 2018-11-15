@@ -97,11 +97,6 @@ private:
   std::function<void(std::map<std::string, boost::any>)> callback_function;
 };
 
-static void workThread(const std::string node_name,
-                      std::function<void(std::map<std::string, boost::any>)> user_callback) {
-        rqt_reconfigure::Server_cpp<ConfigureVec>(node_name, user_callback);
-      }
-
 
 template <class ConfigType>
 class Server {
@@ -112,6 +107,11 @@ class Server {
         std::string new_node_name = "DynamicReconfigure_" + node_name;
         std::thread t(workThread, new_node_name, callback_function);
         t.detach();     
+      }
+
+      static void workThread(const std::string node_name,
+                      std::function<void(std::map<std::string, boost::any>)> user_callback) {
+        rqt_reconfigure::Server_cpp<ConfigType>(node_name, user_callback);
       }
   private:
     std::function<void(std::map<std::string, boost::any>)> callback_function;
