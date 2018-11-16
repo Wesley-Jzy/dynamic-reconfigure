@@ -23,6 +23,7 @@ public:
       printf("error");
     }
   }
+  
   std::vector<rclcpp::Parameter> get_description(){
     std::vector<rclcpp::Parameter> description;
     try {
@@ -91,7 +92,7 @@ public:
       return check_map.find(remote_name)->second;
       //return check_map[remote_name];
     }
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client");
+    auto node = rclcpp::Node::make_shared("get_parameters_try_client" + std::to_string(getpid()));
     std::shared_ptr<Client> get = std::make_shared<Client>(node, remote_name);
     check_map[remote_name] = get;
     return get;

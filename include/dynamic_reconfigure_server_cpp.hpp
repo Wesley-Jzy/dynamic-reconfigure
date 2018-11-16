@@ -105,8 +105,11 @@ class Server {
                       std::function<void(std::map<std::string, boost::any>)> user_callback)
                       :callback_function(user_callback) {
         std::string new_node_name = "DynamicReconfigure_" + node_name;
-        std::thread t(workThread, new_node_name, callback_function);
-        t.detach();     
+        t = std::thread(workThread, new_node_name, callback_function);    
+      }
+      
+      ~Server() {
+        t.join();
       }
 
       static void workThread(const std::string node_name,
@@ -114,6 +117,7 @@ class Server {
         rqt_reconfigure::Server_cpp<ConfigType>(node_name, user_callback);
       }
   private:
+    std::thread t;
     std::function<void(std::map<std::string, boost::any>)> callback_function;
 };
 
