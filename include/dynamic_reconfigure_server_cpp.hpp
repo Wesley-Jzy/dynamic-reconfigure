@@ -17,6 +17,9 @@
 #include <boost/any.hpp>
 
 #include <thread>
+#include <boost/uuid/uuid.hpp> 
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp> 
 
 namespace rqt_reconfigure {
 
@@ -104,7 +107,11 @@ class Server {
       explicit Server(const std::string node_name,
                       std::function<void(std::map<std::string, boost::any>)> user_callback)
                       :callback_function(user_callback) {
-        std::string new_node_name = "DynamicReconfigure_" + node_name;
+        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+        std::string tmp_uuid = boost::uuids::to_string(uuid);
+        tmp_uuid.erase(std::remove(tmp_uuid.begin(), tmp_uuid.end(), '-'), tmp_uuid.end());
+        std::string new_node_name = "DynamicReconfigure_" + node_name + tmp_uuid;
+
         t = std::thread(workThread, new_node_name, callback_function);    
       }
       

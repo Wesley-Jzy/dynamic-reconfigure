@@ -2,8 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <map>
-
-
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 
 namespace rqt_reconfigure{
@@ -92,7 +93,12 @@ public:
       return check_map.find(remote_name)->second;
       //return check_map[remote_name];
     }
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client" + std::to_string(getpid()));
+    
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    std::string tmp_uuid = boost::uuids::to_string(uuid);
+    tmp_uuid.erase(std::remove(tmp_uuid.begin(), tmp_uuid.end(), '-'), tmp_uuid.end());
+
+    auto node = rclcpp::Node::make_shared("get_parameters_try_client" + tmp_uuid);
     std::shared_ptr<Client> get = std::make_shared<Client>(node, remote_name);
     check_map[remote_name] = get;
     return get;
