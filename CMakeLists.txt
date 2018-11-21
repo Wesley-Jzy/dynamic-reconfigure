@@ -73,19 +73,49 @@ function(configure_python_c_extension_library _library_name)
                )
 endfunction()
 
+add_library(${PROJECT_NAME} SHARED
+    src/utils.cpp
+    src/rqt_support.cpp
+    include/${PROJECT_NAME}/dynamic_reconfigure_server_cpp.hpp
+)
+target_link_libraries(${PROJECT_NAME}
+    uuid
+)
+
+ament_target_dependencies(${PROJECT_NAME} "rcl" "rcutils" "rclcpp")
+#SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CPP)
+
 add_library(dynamic_reconfigure_ SHARED dynamic_reconfigure/_dynamic_reconfigure.cpp)
+target_link_libraries(dynamic_reconfigure_
+    ${PROJECT_NAME}
+)
 configure_python_c_extension_library(dynamic_reconfigure_)
 ament_target_dependencies(dynamic_reconfigure_ "rcl" "rcutils" "rclcpp")
 
 
 include_directories(include)
 include_directories(cfg)
+include_directories(include/${PROJECT_NAME})
+
 add_executable(test_parameters demo/test_parameters.cpp)
-ament_target_dependencies(test_parameters rclcpp rcutils)
+target_link_libraries(test_parameters
+    ${PROJECT_NAME}
+)
+ament_target_dependencies(test_parameters rclcpp rcutils dynamic_reconfigure)
 install(TARGETS test_parameters DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
+
+install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
 install(FILES cfg/parameter_generator_catkin.py  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}")
 
+install(
+    TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION bin
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
 
+
+ament_export_libraries( ${PROJECT_NAME} )
 ament_export_include_directories(include)
 ament_package()
+

@@ -17,9 +17,7 @@
 #include <boost/any.hpp>
 
 #include <thread>
-#include <boost/uuid/uuid.hpp> 
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp> 
+#include "utils.hpp"
 
 namespace rqt_reconfigure {
 
@@ -100,34 +98,35 @@ private:
   std::function<void(std::map<std::string, boost::any>)> callback_function;
 };
 
-
 template <class ConfigType>
 class Server {
-  public:
-      explicit Server(const std::string node_name,
-                      std::function<void(std::map<std::string, boost::any>)> user_callback)
-                      :callback_function(user_callback) {
-        boost::uuids::uuid uuid = boost::uuids::random_generator()();
-        std::string tmp_uuid = boost::uuids::to_string(uuid);
-        tmp_uuid.erase(std::remove(tmp_uuid.begin(), tmp_uuid.end(), '-'), tmp_uuid.end());
-        std::string new_node_name = "DynamicReconfigure_" + node_name + tmp_uuid;
+    public:
+        explicit Server(const std::string node_name,
+            std::function<void(std::map<std::string, boost::any>)> user_callback)
+            :callback_function(user_callback) {
 
-        t = std::thread(workThread, new_node_name, callback_function);    
-      }
-      
-      ~Server() {
-        t.join();
-      }
+            Utils utils;
+            std::string uuid_name = utils.get_uuid();
 
-      static void workThread(const std::string node_name,
-                      std::function<void(std::map<std::string, boost::any>)> user_callback) {
-        rqt_reconfigure::Server_cpp<ConfigType>(node_name, user_callback);
-      }
-  private:
-    std::thread t;
-    std::function<void(std::map<std::string, boost::any>)> callback_function;
+            std::string new_node_name = "DynamicReconfigure_" + node_name + uuid_name;
+
+            t = std::thread(workThread, new_node_name, callback_function);    
+        }
+
+        ~Server() {
+            t.join();
+        }
+
+        static void workThread(const std::string node_name,
+            std::function<void(std::map<std::string, boost::any>)> user_callback) {
+            
+            rqt_reconfigure::Server_cpp<ConfigType>(node_name, user_callback);
+        }
+    private:
+        std::thread t;
+        std::function<void(std::map<std::string, boost::any>)> callback_function;
 };
 
-}//rqt_reconfigure
+} //rqt_reconfigure
 
 #endif 
