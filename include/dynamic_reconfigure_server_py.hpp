@@ -19,9 +19,11 @@ public:
   RCLCPP_SMART_PTR_DEFINITIONS(Server_py)
   
   RCLCPP_PUBLIC
-  explicit Server_py(const std::string node_name, PyObject* python_callback_,
-      const std::vector<rclcpp::Parameter> &parameter_init) : python_callback(python_callback_) {
+  explicit Server_py(char* _name, PyObject* python_callback_,
+      const std::vector<rclcpp::Parameter> &parameter_init) 
+      : name(_name), python_callback(python_callback_) {
     printf("Server init____________\n");
+    const std::string node_name = std::string(name);
     node = rclcpp::Node::make_shared(node_name);
     //parameter_service = std::make_shared<rclcpp::ParameterService>(node);
     //auto parameters_init_client = std::make_shared<rclcpp::SyncParametersClient>(node);
@@ -49,6 +51,13 @@ public:
     node->register_param_change_callback(callback);
     rclcpp::spin(node);
   }
+
+  ~Server_py() {
+      if (name) {
+          free(name);
+      }
+  }
+
   void param_change(const std::vector<rclcpp::Parameter> &parameter_changed) {
     for (auto iter = values.begin(); iter != values.end();) {
       if(iter->get_name() == parameter_changed[0].get_name()) {
@@ -92,6 +101,7 @@ public:
   }
 private:
   //std::shared_ptr<rclcpp::ParameterService> parameter_service;
+  char* name;
   rclcpp::Node::SharedPtr node;
   std::vector<rclcpp::Parameter> values;
   PyObject* python_callback;

@@ -15,7 +15,7 @@ def dy_wrapper(service_name, python_handler, cfg_list):
 
 def Server(service_name, python_handler, cfg_list):
     _uuid = str(uuid.uuid4()).replace('-', '')
-    _name = "DynamicReconfigure_" + service_name + _uuid
+    _name = "_DynamicReconfigure_" + service_name + _uuid
     _cfg_list = cfg_list
     dy_wrapper(_name, python_handler, _cfg_list)
 

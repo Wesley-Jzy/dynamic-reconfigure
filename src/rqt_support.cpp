@@ -83,7 +83,7 @@ std::shared_ptr<Client> Client_map::get_client(std::string remote_name) {
     std::string uuid_name(_str);
     uuid_name.erase(std::remove(uuid_name.begin(), uuid_name.end(), '-'), uuid_name.end());
 
-    auto node = rclcpp::Node::make_shared("get_parameters_try_client" + uuid_name);
+    auto node = rclcpp::Node::make_shared("_get_parameters_try_client" + uuid_name);
     std::shared_ptr<Client> get = std::make_shared<Client>(node, remote_name);
     check_map[remote_name] = get;
     return get;

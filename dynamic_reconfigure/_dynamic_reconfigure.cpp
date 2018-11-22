@@ -163,11 +163,7 @@ static rclcpp::Parameter _make_param_add_name(PyObject* dict, PyObject* key, std
 
 
 static void workThread(char* service_name, PyObject *python_handle, std::vector<rclcpp::Parameter> cfg_all) {
-    if (!PyEval_ThreadsInitialized()) {
-        PyEval_InitThreads();
-    }
-    std::string _name = std::string(service_name);
-    rqt_reconfigure::Server_py(_name, python_handle, cfg_all);
+    rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
 }
 
 
@@ -177,6 +173,9 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
     PyObject *python_handle;
     PyObject *cfg_list;
     PyArg_ParseTuple(args, "zOO", &service_name, &python_handle, &cfg_list);
+
+    char* _name = (char *)malloc(1000);
+    strcpy(_name, service_name);
 
     std::vector<rclcpp::Parameter> cfg_all;
 
@@ -194,7 +193,7 @@ static  PyObject *params_service_init(PyObject * Py_UNUSED(self), PyObject *args
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "default"));
         cfg_all.push_back(_make_param_add_name(param, Py_BuildValue("s","default"), name_c, "value"));
     }
-    std::thread t(workThread, service_name, python_handle, cfg_all);
+    std::thread t(workThread, _name, python_handle, cfg_all);
     t.detach();
     //rqt_reconfigure::Server_py(service_name, python_handle, cfg_all);
     Py_RETURN_NONE;

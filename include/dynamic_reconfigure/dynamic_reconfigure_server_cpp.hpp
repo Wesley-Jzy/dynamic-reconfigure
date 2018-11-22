@@ -108,7 +108,7 @@ class Server {
             Utils utils;
             std::string uuid_name = utils.get_uuid();
 
-            std::string new_node_name = "DynamicReconfigure_" + node_name + uuid_name;
+            std::string new_node_name = "_DynamicReconfigure_" + node_name + uuid_name;
 
             t = std::thread(workThread, new_node_name, callback_function);    
         }
